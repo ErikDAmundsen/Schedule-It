@@ -1,0 +1,34 @@
+        public WorkTimeEventController() { }
+        public WorkTimeEventController(Applicationdbcontext userManager, ApplicationSignInManager signInManager)
+        {
+            UserManager = userManager;
+            //SignInManager = signInManager;
+        }
+        public Applicationdbcontext UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<Applicationdbcontext>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
+        [HttpPost]
+        public ActionResult Index(EventListVm EVMView, string DateFilterSort, string HoursSorter,  int PayYear, string PayPeriod)
+        [AllowAnonymous]
+        public ActionResult Create(LoginViewModel lvm)    // workTimeEvent grabs the login email, password, and remember me
+        {
+            
+            //Get the current time first thing to ensure there's minimal delay between selecting clockin on the front-end and the time saved in the database
+            DateTime? dt = DateTime.Now;
+            //this line grabs user from database by email or username
+            var user = db.Users.SingleOrDefault(x => x.UserName == lvm.Email || x.Email == lvm.Email);
+            var userRole = UserManager.GetRoles(user.Id).First();
+           
+            if (userRole == "Terminated" || userRole == "Blocked" || userRole == "ViewMode"  )
+            {
+                 ModelState.AddModelError("", " Your account is no longer valid for clocking in, contact your system administrator for further information.");
+                return View("~/Views/Account/Login.cshtml", lvm);
+            }
