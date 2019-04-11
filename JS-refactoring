@@ -1,0 +1,36 @@
+<script type="text/javascript">
+
+    //login page
+   const VerifyUserForClockURL = '@Url.Action("VerifyUserForClock", "Account")';
+   const CheckForUserDataURL = '@Url.Action("CheckForUserData", "Account")';
+ 
+    //message index page andmessage details
+    const UpdateUnreadMessageURL = '@Url.Action("UpdateUnreadMessage", "Message")';
+
+   
+   
+
+    //worktime event index
+     const EditUserURL = '@Url.Action("Edit","WorkTimeEvent")';
+    const PayPeriodURL = '@Url.Action("getPayPeriodDropDown", "PayPeriod")';        
+    
+  
+</script>
+----------------an example of one of the URL>AJAx from above --------------------------
+function userEditModal(EventId) {
+    jQuery.ajax({
+        'url': EditUserURL,
+        'type': 'GET',
+        'data': {
+            id: EventId
+        },
+        'success': function (data) {
+            document.getElementById("userEditModalBody").innerHTML = data;
+            $('#MyModal').modal('show');
+        },
+        error: function () {
+            alert("An error Occurred.  Please try again or contact your system administrator.");
+        }
+
+    })
+};
