@@ -22,8 +22,54 @@ ________________________FROM CONTROLLER_________________________________________
                     C.Create(lvm, null, true);
                 }
             }
- 
- 
+--------------------------------------------------------------------- 
+  if (notFinishedEvent != null && calledFromServer == false)
+            {
+                //append to existing(if existed) note in DB
+                notFinishedEvent.Note += note;
+
+               //Update the current open event with an end datetime.
+                notFinishedEvent.Clockout();
+                db.SaveChanges();
+          
+                if (breaklength!= null)
+                {
+                     TempData["message"] = "Successful Clock out at " + DateTime.Now.ToString("h:mm tt") + " You will automatically be clocked in after " + breaklength + " minutes.";
+                    StartBreakTimer(breaklength.Value, lvm, dbUser);
+                    //
+                   
+                }
+            //Create message to be passed to the Login Action for use on Login View if not autoclocking back in
+                if (breaklength == null)
+                {
+                    
+                    TempData["message"] = "Successful Clock out at " + DateTime.Now.ToString("h:mm tt");
+                }
+                
+                return RedirectToAction("Login", "Account");
+            }
+           
+            else
+            // clock in
+            {
+                //If not clocked in, create a new worktimevent, set it's date to right now and adds the note.
+                WorkTimeEvent clockIn = new WorkTimeEvent(dbUser, note, dt);
+                db.WorkTimeEvents.Add(clockIn);
+                db.SaveChanges();
+               
+                //Create message to be passed to the Login Action for use on Login View
+                TempData["message"] = "Successful Clock in at " + DateTime.Now.ToString("h:mm tt");
+                if (calledFromServer == true)
+                {
+                    return new EmptyResult();
+
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+            }
+        }
  
  
 
