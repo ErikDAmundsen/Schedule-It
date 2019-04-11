@@ -1,0 +1,46 @@
+  _____________________________________FROM CONTROLLER________________________________________________________
+  [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,User")]
+        [ActionName("Edit")]
+        public ActionResult EditTime(Guid? Id) //gets the worktimeEvent ID
+        public ActionResult EditTime(Guid? EventId) //gets the worktimeEvent ID
+        {
+            if (Id == null)
+            if (EventId == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var EventToUpdate = db.WorkTimeEvents.Find(Id); //searches for WorktimeEvent with given Id in the DB
+            var EventToUpdate = db.WorkTimeEvents.Find(EventId); //searches for WorktimeEvent with given Id in the DB
+            if (User.IsInRole("Admin"))
+            {
+                var originalStartTime = EventToUpdate.Start.ToString();
+                var originalEndTime = EventToUpdate.End.ToString();
+                
+                TryUpdateModel(EventToUpdate, "",
+         new string[] { "Start", "End", "Note" });
+                EventToUpdate.ReadOnlyNote = "Your hours from " + originalStartTime + " - " + originalEndTime + " were changed to " + EventToUpdate.Start.ToString() + " - " + EventToUpdate.End.ToString();
+                //wont allow people to edit their shifts to end at a time later than the current time.
+                DateTime Now = DateTime.Now;
+                if (EventToUpdate.End > Now)
+                {
+                    return Json(new { message = "Cannot set finish time to time that is later than current time.", edited = false });
+                }
+                ________________________________________________AJAX METHOD______________________________________________________
+                function EditWTE() {
+    var form = $('#modal-edit-form').serialize();
+    $.post(
+        {
+        url: 'Edit',
+        data:   form  ,
+            success: function (response) {
+           
+            
+                if (response.edited == false) {
+                    document.getElementById("edit-error").innerHTML = "Cannot edit your shift to end at a time that is later than the present time.";
+                }
+                else {location.reload()}
+
+        }
+    })
+}
