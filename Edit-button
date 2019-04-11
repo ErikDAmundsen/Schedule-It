@@ -44,3 +44,28 @@
         }
     })
 }
+
+
+
+
+
+
+ EventToUpdate.ReadOnlyNote = "Your hours from " + originalStartTime + " - " + originalEndTime + " were changed to " + EventToUpdate.Start.ToString() + " - " + EventToUpdate.End.ToString();
+                //wont allow people to edit their shifts to end at a time later than the current time.
+                DateTime Now = DateTime.Now;
+      
+                if (EventToUpdate.End > Now)
+                {
+                    return Json(new { message = "Cannot set finish time to time that is later than current time.", edited = false });
+                    return Json(new { message = "Cannot set finish ", edited = false });
+                }
+                //keeps people from entering an end time that is earlier than their beginning time
+                if (EventToUpdate.End < EventToUpdate.Start)
+                {
+                    return Json(new { message2 = "Cannot set end time to be earlier than start time",
+                        TimeSequence = false
+                             
+                    });
+                }
+                try
+                {
