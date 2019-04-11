@@ -1,0 +1,43 @@
+________________________FROM CONTROLLER__________________________________________________________
+
+ public static Timer BreakTimer;
+            public void StartBreakTimer(int breaklength,LoginViewModel lvm, ApplicationUser user )
+            {
+                BreakTimer = new Timer(breaklength * 60000);
+                BreakTimer.Enabled = true;
+                BreakTimer.AutoReset = false;
+                user.BreakTimeRunning = true;
+                db.SaveChanges();
+           
+
+                BreakTimer.Elapsed += (sender,e) =>  ClockinAfterTimer(sender,e, lvm,BreakTimer, user);
+            }
+
+            public  void ClockinAfterTimer(object sender, ElapsedEventArgs e,LoginViewModel lvm, Timer timer ,ApplicationUser user)
+            {
+                if (user.BreakTimeRunning == true)
+                {
+                    timer.Dispose();
+                    WorkTimeEventController C = new WorkTimeEventController();
+                    C.Create(lvm, null, true);
+                }
+            }
+ 
+ 
+ 
+ 
+
+                   
+                    
+                    
+                        TempData["message"] = "Successful Clock in at " + DateTime.Now.ToString("h:mm tt");
+                if (calledFromServer == true)
+                {
+                    return new EmptyResult();
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+            }
+        }
